@@ -1,0 +1,7 @@
+# Diva Junction
+Options -Indexes
+DirectoryIndex index.php
+
+<FilesMatch "^(config\.php|README\.md)$">
+    Require all denied
+</FilesMatch>

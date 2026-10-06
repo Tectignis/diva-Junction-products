@@ -1,0 +1,3 @@
+# Runtime database (created + seeded automatically on first request)
+data/*.sqlite
+data/*.sqlite-*

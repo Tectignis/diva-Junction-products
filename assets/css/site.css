@@ -1,0 +1,741 @@
+/* =====================================================================
+   Diva Junction — public site
+   All measurements use "design units" (--u) taken from the 1080 px wide
+   reference artwork, so every page scales exactly like the mockups.
+   ===================================================================== */
+
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url("../fonts/inter-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Inter";
+    font-style: italic;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url("../fonts/inter-latin-italic.woff2") format("woff2");
+}
+
+:root {
+    --blue: #1642b9;
+    --blue-ink: #12379b;
+    --magenta: #be1b8c;
+    --cream: #fffef3;
+    --lavender: #dae1f4;
+    --navy: #01123b;
+    --rail: #252525;
+    --font: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+    display: block;
+    max-width: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+    outline: 3px solid #ffd400;
+    outline-offset: 3px;
+}
+
+/* =====================================================================
+   LANDING (index.php)
+   Portrait screens: the 9:16 poster covers the viewport.
+   Wide screens: the poster is contained and the art is blurred behind it.
+   ===================================================================== */
+
+.landing {
+    --sw: max(100vw, 100svh * 0.5625);
+    --u: calc(var(--sw) / 1080);
+    min-height: 100svh;
+    overflow-x: hidden;
+    background: #c3d2f3;
+}
+
+@media (min-aspect-ratio: 3/4) {
+    .landing {
+        --sw: min(100vw, 100svh * 0.5625);
+        overflow: hidden;
+    }
+
+    .landing::before {
+        content: "";
+        position: fixed;
+        inset: -60px;
+        background: var(--landing-bg) center / cover no-repeat;
+        filter: blur(36px) saturate(1.15);
+        opacity: 0.85;
+    }
+
+    .landing .stage {
+        box-shadow: 0 0 80px rgba(12, 30, 100, 0.25);
+    }
+}
+
+.stage {
+    position: relative;
+    left: 50%;
+    width: var(--sw);
+    height: calc(var(--sw) * 1920 / 1080);
+    transform: translateX(-50%);
+    overflow: hidden;
+}
+
+.stage-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.landing .corner-icon {
+    top: calc(61 * var(--u));
+    /* keep the icon inside the visible area when the poster is cropped */
+    right: calc(62 * var(--u) + max(0px, (var(--sw) - 100vw) / 2));
+    border-radius: calc(16 * var(--u));
+}
+
+.board-welcome {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.board-welcome span {
+    position: absolute;
+    top: calc(264 * var(--u));
+    left: calc(280 * var(--u));
+    width: calc(520 * var(--u));
+    color: var(--magenta);
+    font-size: calc(40 * var(--u));
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    text-align: center;
+}
+
+.board-logo {
+    position: absolute;
+    top: calc(312 * var(--u));
+    left: calc(343 * var(--u));
+    width: calc(391 * var(--u));
+    height: auto;
+    filter: drop-shadow(0 calc(6 * var(--u)) calc(10 * var(--u)) rgba(30, 20, 90, 0.18));
+}
+
+.board-tagline {
+    position: absolute;
+    top: calc(709 * var(--u));
+    left: calc(285 * var(--u));
+    width: calc(510 * var(--u));
+    margin: 0;
+    color: var(--magenta);
+    font-size: calc(38 * var(--u));
+    font-weight: 800;
+    line-height: calc(50 * var(--u));
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.landing-cta {
+    position: absolute;
+    top: calc(938 * var(--u));
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: calc(340 * var(--u));
+    height: calc(100 * var(--u));
+    padding: calc(3 * var(--u)) calc(44 * var(--u)) 0;
+    border: calc(5 * var(--u)) solid transparent;
+    border-radius: 999px;
+    background:
+        linear-gradient(var(--magenta), var(--magenta)) padding-box,
+        linear-gradient(180deg, #f8e6f1 0%, #e2b3d3 45%, #9a2a7a 100%) border-box;
+    box-shadow: 0 calc(5 * var(--u)) calc(10 * var(--u)) rgba(70, 12, 70, 0.28);
+    color: #fffbe9;
+    font-size: calc(51 * var(--u));
+    font-weight: 700;
+    letter-spacing: -0.048em;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.landing-cta:hover {
+    filter: brightness(1.08);
+    transform: translateX(-50%) translateY(calc(-3 * var(--u)));
+}
+
+.landing-cta:active {
+    transform: translateX(-50%) scale(0.97);
+}
+
+/* gentle entrance */
+@media (prefers-reduced-motion: no-preference) {
+    .board-welcome span,
+    .board-logo,
+    .board-tagline,
+    .landing-cta {
+        animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .board-logo { animation-delay: 0.08s; }
+    .board-tagline { animation-delay: 0.16s; }
+    .landing-cta { animation-name: rise-x; animation-delay: 0.26s; }
+}
+
+@keyframes rise {
+    from { opacity: 0; translate: 0 calc(24 * var(--u)); }
+}
+
+@keyframes rise-x {
+    from { opacity: 0; translate: 0 calc(24 * var(--u)); }
+}
+
+/* shared: Flipkart corner icon */
+.corner-icon {
+    position: absolute;
+    z-index: 5;
+    width: calc(91 * var(--u));
+    border-radius: calc(16 * var(--u));
+    transition: transform 0.2s ease;
+}
+
+.corner-icon img {
+    width: 100%;
+    height: auto;
+    border-radius: inherit;
+}
+
+.corner-icon:hover {
+    transform: rotate(-6deg) scale(1.05);
+}
+
+/* =====================================================================
+   PRODUCT PAGE (shop.php)
+   ===================================================================== */
+
+.shop {
+    min-height: 100svh;
+    background: var(--lavender);
+    color: var(--blue);
+}
+
+.page {
+    position: relative;
+    width: min(100%, 620px);
+    margin: 0 auto;
+    overflow: hidden;
+    container-type: inline-size;
+    --u: calc(100cqw / 1080);
+}
+
+.deco {
+    position: absolute;
+    top: calc(var(--y) * var(--u));
+    left: calc(var(--x) * var(--u));
+    width: calc(var(--w) * var(--u));
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ------------------------------------------------------------- hero */
+
+.hero {
+    position: relative;
+    height: calc(816 * var(--u));
+    margin-bottom: calc(67 * var(--u));
+}
+
+.hero .corner-icon {
+    top: calc(55 * var(--u));
+    left: calc(928 * var(--u));
+}
+
+.hero-logo {
+    position: absolute;
+    z-index: 3;
+    top: calc(45 * var(--u));
+    left: calc(343 * var(--u));
+    width: calc(395 * var(--u));
+    height: auto;
+}
+
+.hero-card {
+    position: absolute;
+    z-index: 2;
+    top: calc(367 * var(--u));
+    left: calc(112 * var(--u));
+    width: calc(853 * var(--u));
+    height: calc(450 * var(--u));
+    overflow: hidden;
+    border-radius: calc(38 * var(--u));
+    background: #f0f3fb;
+}
+
+.hero-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-copy {
+    position: absolute;
+    top: calc(41 * var(--u));
+    left: calc(43 * var(--u));
+}
+
+.hero-copy h1 {
+    margin: 0;
+    font-size: calc(65 * var(--u));
+    font-weight: 700;
+    line-height: calc(69 * var(--u));
+    letter-spacing: -0.04em;
+}
+
+.hero-line {
+    display: block;
+    color: var(--blue-ink);
+}
+
+em.hero-line {
+    color: var(--magenta);
+    font-style: italic;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.pill-blue {
+    position: absolute;
+    top: calc(291 * var(--u));
+    left: calc(5 * var(--u));
+    min-width: calc(161 * var(--u));
+    height: calc(59 * var(--u));
+    padding: 0 calc(26 * var(--u)) calc(1 * var(--u));
+    background: #143ca9;
+    color: #fffef3;
+    font-size: calc(30 * var(--u));
+    font-style: italic;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    word-spacing: -0.15em;
+}
+
+.pill-blue:hover {
+    filter: brightness(1.15);
+    transform: translateY(calc(-3 * var(--u)));
+}
+
+/* ------------------------------------------------------------- featured */
+
+.featured {
+    position: relative;
+}
+
+.featured-band {
+    height: calc(95 * var(--u));
+    margin: 0;
+    background: var(--magenta);
+    color: #fffef3;
+    font-size: calc(62 * var(--u));
+    font-weight: 900;
+    line-height: calc(99 * var(--u));
+    letter-spacing: 0.03em;
+    text-align: center;
+    overflow: hidden;
+}
+
+.featured-track {
+    display: flex;
+    gap: calc(22 * var(--u));
+    padding: 0 calc(85 * var(--u)) 0 calc(112 * var(--u));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: calc(112 * var(--u));
+    scrollbar-width: none;
+    background: linear-gradient(var(--cream) 0 calc(383 * var(--u)), var(--magenta) 0);
+}
+
+.featured-track::-webkit-scrollbar,
+.brand-track::-webkit-scrollbar {
+    display: none;
+}
+
+.feat {
+    flex: 0 0 calc(280 * var(--u));
+    display: flex;
+    flex-direction: column;
+    height: calc(514 * var(--u));
+    padding-top: calc(31 * var(--u));
+    scroll-snap-align: start;
+}
+
+.feat-card {
+    position: relative;
+    display: block;
+    width: calc(280 * var(--u));
+    height: calc(281 * var(--u));
+    overflow: hidden;
+    border: calc(4 * var(--u)) solid #111;
+    border-radius: calc(26 * var(--u));
+    background:
+        linear-gradient(120deg,
+            transparent 40.8%, #2e55bf 40.8% 57.5%,
+            transparent 57.5% 65.7%, #2e55bf 65.7% 71.3%,
+            transparent 71.3%),
+        #1642b9;
+}
+
+.feat-card img {
+    position: absolute;
+    inset: calc(-4 * var(--u));
+    width: calc(100% + 8 * var(--u));
+    height: calc(100% + 8 * var(--u));
+    object-fit: contain;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.feat:hover .feat-card img {
+    transform: scale(1.06) rotate(-2deg);
+}
+
+.feat-title {
+    margin-top: calc(17 * var(--u));
+    overflow: hidden;
+    color: var(--blue);
+    font-size: calc(34 * var(--u));
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.feat-brand {
+    margin-top: calc(40 * var(--u));
+    overflow: hidden;
+    color: #fffef3;
+    font-size: calc(28 * var(--u));
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.feat-tag {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    height: calc(37 * var(--u));
+    margin-top: calc(17 * var(--u));
+    padding: 0 calc(18 * var(--u)) calc(2 * var(--u));
+    border-radius: 999px;
+    background: #fffef3;
+    color: var(--magenta);
+    font-size: calc(25 * var(--u));
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    min-width: calc(137 * var(--u));
+    justify-content: center;
+}
+
+.featured-rail {
+    height: calc(15 * var(--u));
+    background: var(--rail);
+}
+
+/* ------------------------------------------------------------- brands */
+
+.brands {
+    position: relative;
+    padding-top: calc(62 * var(--u));
+}
+
+.section-title {
+    position: relative;
+    margin: 0 0 calc(45 * var(--u));
+    color: var(--blue);
+    font-size: calc(43 * var(--u));
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-align: center;
+}
+
+.brand-row {
+    --sign: 163; /* x of the station sign centre */
+    position: relative;
+    height: calc(369 * var(--u));
+}
+
+.brand-row + .brand-row {
+    margin-top: calc(64 * var(--u));
+}
+
+.brand-row.is-right {
+    --sign: 900;
+}
+
+.brand-panel {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    overflow: hidden;
+    border: calc(3 * var(--u)) solid var(--blue);
+    background: var(--cream);
+}
+
+.is-left .brand-panel {
+    left: calc(163 * var(--u));
+    right: calc(45 * var(--u));
+    border-radius: 0 calc(40 * var(--u)) calc(40 * var(--u)) 0;
+}
+
+.is-right .brand-panel {
+    left: calc(30 * var(--u));
+    right: calc(180 * var(--u));
+    border-radius: calc(40 * var(--u)) 0 0 calc(40 * var(--u));
+}
+
+.brand-track {
+    position: absolute;
+    top: calc(49 * var(--u));
+    bottom: 0;
+    display: flex;
+    gap: calc(29 * var(--u));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 80 * var(--u)), transparent calc(100% - 4 * var(--u)));
+    mask-image: linear-gradient(90deg, #000 calc(100% - 80 * var(--u)), transparent calc(100% - 4 * var(--u)));
+}
+
+.is-left .brand-track {
+    left: calc(142 * var(--u));
+    right: 0;
+    padding-right: calc(70 * var(--u));
+    scroll-padding-left: 0;
+}
+
+.is-right .brand-track {
+    left: calc(33 * var(--u));
+    right: calc(97 * var(--u));
+    padding-right: calc(70 * var(--u));
+}
+
+.product {
+    flex: 0 0 calc(221 * var(--u));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    scroll-snap-align: start;
+}
+
+.product-card {
+    display: block;
+    width: calc(221 * var(--u));
+    height: calc(222 * var(--u));
+    overflow: hidden;
+    border-radius: calc(24 * var(--u));
+    background: #f3f3f5;
+    box-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgba(20, 40, 120, 0.06);
+}
+
+.product-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.product:hover .product-card img {
+    transform: scale(1.06);
+}
+
+.product-name {
+    max-width: 100%;
+    margin-top: calc(17 * var(--u));
+    overflow: hidden;
+    color: var(--blue);
+    font-size: calc(25 * var(--u));
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* station sign: diamond + roundel + name bar + pole */
+.station {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.station > * {
+    position: absolute;
+    display: block;
+}
+
+.station-pole {
+    top: calc(258 * var(--u));
+    left: calc((var(--sign) - 29) * var(--u));
+    width: calc(58 * var(--u));
+    height: calc(111 * var(--u));
+    background: linear-gradient(90deg,
+        #002589 0%, #01268a 12%, #0a339c 26%, #1d48b9 40%, #2f5bd5 52%,
+        #2853ca 62%, #1740af 74%, #073097 88%, #01288d 100%);
+}
+
+.station-diamond {
+    top: calc(38.5 * var(--u));
+    left: calc((var(--sign) - 95.5) * var(--u));
+    width: calc(191 * var(--u));
+    height: calc(191 * var(--u));
+    border: calc(5 * var(--u)) solid var(--blue);
+    background: #fffff7;
+    transform: rotate(45deg);
+}
+
+.station-ring {
+    top: calc(63 * var(--u));
+    left: calc((var(--sign) - 71) * var(--u));
+    width: calc(142 * var(--u));
+    height: calc(142 * var(--u));
+    border: calc(21 * var(--u)) solid var(--magenta);
+    border-radius: 50%;
+}
+
+.station-name {
+    top: calc(115 * var(--u));
+    left: calc(var(--sign) * var(--u));
+    min-width: calc(182 * var(--u));
+    max-width: calc(230 * var(--u));
+    height: calc(41 * var(--u));
+    padding: 0 calc(4 * var(--u));
+    overflow: hidden;
+    background: var(--blue);
+    color: #fff;
+    font-size: calc(34 * var(--u));
+    font-weight: 500;
+    line-height: calc(41 * var(--u));
+    letter-spacing: -0.05em;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
+
+.station-name.is-long { font-size: calc(28 * var(--u)); }
+.station-name.is-xlong { font-size: calc(22 * var(--u)); }
+
+/* ------------------------------------------------------------- countdown */
+
+.countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(21 * var(--u));
+    padding: calc(55 * var(--u)) 0 calc(59 * var(--u)) calc(18 * var(--u));
+    margin-left: 0;
+}
+
+.countdown-label {
+    margin: 0;
+    color: var(--blue);
+    font-size: calc(48 * var(--u));
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+}
+
+.countdown-board {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(283 * var(--u));
+    height: calc(108 * var(--u));
+    border-radius: calc(22 * var(--u));
+    background: var(--navy);
+}
+
+.dot-matrix {
+    width: calc(192 * var(--u));
+    height: auto;
+    overflow: visible;
+}
+
+/* ------------------------------------------------------------- wide screens */
+
+@media (min-width: 621px) {
+    .shop .deco[style*="--x:0"],
+    .shop .deco[style*="--x:-"] {
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
+        mask-image: linear-gradient(90deg, transparent, #000 30%);
+    }
+
+    .shop .deco[style*="--x:937"] {
+        -webkit-mask-image: linear-gradient(270deg, transparent, #000 40%);
+        mask-image: linear-gradient(270deg, transparent, #000 40%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}
