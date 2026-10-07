@@ -1,18 +1,21 @@
 <?php
-require_once __DIR__ . '/inc/helpers.php';
+require_once __DIR__ . '/inc/geofence.php';
+geofence_gate();
 
-$featured = db()->query('SELECT * FROM featured WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
-$brands   = db()->query('SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
-$productsByBrand = [];
-foreach (db()->query('SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order, id') as $p) {
-    $productsByBrand[$p['brand_id']][] = $p;
+$sections = db()->query('SELECT * FROM sections WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
+$tilesBySection = [];
+foreach (db()->query('SELECT * FROM tiles WHERE is_active = 1 ORDER BY sort_order, id') as $t) {
+    $tilesBySection[$t['section_id']][] = $t;
 }
+$sections = array_filter($sections, fn($s) => !empty($tilesBySection[$s['id']]));
 
-$pageTitle = setting('site_title');
-$bodyClass = 'shop';
-$bodyStyle = '';
-$heroLink  = safe_link(setting('hero_cta_link'));
-$fkLink    = safe_link(setting('flipkart_link'));
+$pageTitle   = setting('site_title');
+$bodyClass   = 'store';
+$bodyStyle   = '';
+$heroLink    = safe_link(setting('hero_cta_link'));
+$fkLink      = safe_link(setting('flipkart_link'));
+$bannerLink  = safe_link(setting('banner_link'));
+$bannerImage = setting_raw('banner_image');
 
 /** target/rel attributes for outbound links */
 function link_attrs(string $url): string
@@ -20,26 +23,21 @@ function link_attrs(string $url): string
     return is_external($url) ? ' target="_blank" rel="noopener"' : '';
 }
 
-/** Shrink long station names so they fit the sign bar. */
-function station_size(string $name): string
-{
-    $len = mb_strlen($name);
-    return $len <= 10 ? '' : ($len <= 14 ? ' is-long' : ' is-xlong');
-}
-
 require __DIR__ . '/inc/head.php';
 ?>
-<div class="page">
+<div class="store-page">
 
-    <!-- ============================== HERO -->
-    <header class="hero">
-        <img class="deco" src="<?= e(asset('assets/img/cloud-1.png')) ?>" alt="" style="--x:0;--y:298;--w:354">
-        <img class="deco" src="<?= e(asset('assets/img/bird-1.png')) ?>" alt="" style="--x:64;--y:244;--w:93">
-        <img class="deco" src="<?= e(asset('assets/img/bird-2.png')) ?>" alt="" style="--x:977;--y:822;--w:65">
+    <!-- ============================== HEADER (same artwork as the microsite) -->
+    <header class="store-hero">
+        <img class="deco" src="<?= e(asset('assets/img/cloud-1.png')) ?>" alt="" style="--x:0;--y:62;--w:30">
+        <img class="deco" src="<?= e(asset('assets/img/bird-1.png')) ?>" alt="" style="--x:6;--y:52;--w:8">
+        <img class="deco" src="<?= e(asset('assets/img/bird-2.png')) ?>" alt="" style="--x:91;--y:86;--w:6">
 
         <a class="corner-icon" href="<?= e($fkLink) ?>"<?= link_attrs($fkLink) ?>>
             <img src="<?= e(asset(setting('flipkart_icon'))) ?>" alt="Flipkart">
         </a>
+
+        <img class="store-logo" src="<?= e(asset(setting('logo'))) ?>" alt="Diva Junction">
 
         <div class="hero-card">
             <img class="hero-art" src="<?= e(asset(setting('hero_image'))) ?>" alt="" fetchpriority="high">
@@ -48,76 +46,48 @@ require __DIR__ . '/inc/head.php';
                     <span class="hero-line"><?= e_lines(setting('hero_heading')) ?></span>
                     <em class="hero-line"><?= e_lines(setting('hero_highlight')) ?></em>
                 </h1>
-                <a class="pill pill-blue" href="<?= e($heroLink) ?>"<?= link_attrs($heroLink) ?>><?= e(setting('hero_cta_text')) ?></a>
+                <a class="hero-pill" href="<?= e($heroLink) ?>"<?= link_attrs($heroLink) ?>><?= e(setting('hero_cta_text')) ?></a>
             </div>
         </div>
-
-        <img class="hero-logo" src="<?= e(asset(setting('logo'))) ?>" alt="Diva Junction">
     </header>
 
-    <?php if ($featured): ?>
-    <!-- ============================== FEATURED -->
-    <section class="featured" id="featured" aria-labelledby="featured-title">
-        <h2 class="featured-band" id="featured-title"><?= e(setting('featured_title')) ?></h2>
-        <div class="featured-track">
-            <?php foreach ($featured as $f): $link = safe_link($f['link']); ?>
-            <a class="feat" href="<?= e($link) ?>"<?= link_attrs($link) ?>>
-                <span class="feat-card">
-                    <?php if ($f['image']): ?><img src="<?= e(asset($f['image'])) ?>" alt="" loading="lazy"><?php endif; ?>
-                </span>
-                <span class="feat-title"><?= e($f['title']) ?></span>
-                <span class="feat-brand"><?= e($f['brand']) ?></span>
-                <?php if ($f['deal_tag'] !== ''): ?><span class="feat-tag"><?= e($f['deal_tag']) ?></span><?php endif; ?>
-            </a>
-            <?php endforeach; ?>
-        </div>
-        <div class="featured-rail"></div>
-    </section>
-    <?php endif; ?>
-
-    <?php if ($brands): ?>
-    <!-- ============================== SHOP BY BRANDS -->
-    <section class="brands" aria-labelledby="brands-title">
-        <img class="deco" src="<?= e(asset('assets/img/cloud-2.png')) ?>" alt="" style="--x:0;--y:88;--w:253">
-        <img class="deco" src="<?= e(asset('assets/img/bird-3.png')) ?>" alt="" style="--x:41;--y:137;--w:71">
-
-        <h2 class="section-title" id="brands-title"><?= e(setting('brands_title')) ?></h2>
-
-        <?php foreach ($brands as $i => $b):
-            $side = $b['sign_side'] === 'auto' ? ($i % 2 === 0 ? 'left' : 'right') : $b['sign_side'];
-            $items = $productsByBrand[$b['id']] ?? [];
+    <!-- ============================== SECTIONS OF TILES -->
+    <main id="deals">
+        <?php foreach ($sections as $s):
+            $tiles = $tilesBySection[$s['id']];
+            $carousel = $s['layout'] === 'carousel';
         ?>
-        <article class="brand-row is-<?= $side ?>" aria-label="<?= e($b['name']) ?>">
-            <?php if ($side === 'right' && $i > 0): ?>
-            <img class="deco" src="<?= e(asset('assets/img/cloud-3.png')) ?>" alt="" style="--x:937;--y:-7;--w:143">
-            <?php elseif ($side === 'left' && $i > 0): ?>
-            <img class="deco" src="<?= e(asset('assets/img/cloud-2.png')) ?>" alt="" style="--x:-110;--y:-13;--w:253">
-            <?php endif; ?>
-
-            <div class="brand-panel">
-                <div class="brand-track">
-                    <?php foreach ($items as $p): $link = safe_link($p['link']); ?>
-                    <a class="product" href="<?= e($link) ?>"<?= link_attrs($link) ?>>
-                        <span class="product-card">
-                            <?php if ($p['image']): ?><img src="<?= e(asset($p['image'])) ?>" alt="" loading="lazy"><?php endif; ?>
-                        </span>
-                        <span class="product-name"><?= e($p['name']) ?></span>
-                    </a>
-                    <?php endforeach; ?>
+        <section class="store-section is-<?= $carousel ? 'carousel' : 'grid' ?>" aria-labelledby="section-<?= (int) $s['id'] ?>"<?= $carousel ? ' data-carousel' : '' ?>>
+            <div class="section-head">
+                <h2 id="section-<?= (int) $s['id'] ?>"><?= e($s['title']) ?></h2>
+                <?php if ($carousel): ?>
+                <div class="carousel-nav">
+                    <button type="button" class="carousel-btn" data-dir="-1" aria-label="Previous" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6"/></svg></button>
+                    <button type="button" class="carousel-btn" data-dir="1" aria-label="Next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button>
                 </div>
+                <?php endif; ?>
             </div>
-
-            <div class="station" aria-hidden="true">
-                <span class="station-pole"></span>
-                <span class="station-diamond"></span>
-                <span class="station-ring"></span>
-                <span class="station-name<?= station_size($b['name']) ?>"><?= e($b['name']) ?></span>
+            <div class="tiles">
+                <?php foreach ($tiles as $t): $link = safe_link($t['link']); ?>
+                <a class="tile" href="<?= e($link) ?>"<?= link_attrs($link) ?>>
+                    <span class="tile-photo">
+                        <?php if ($t['image']): ?><img src="<?= e(asset($t['image'])) ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
+                    </span>
+                    <span class="tile-cap">
+                        <span class="tile-text">
+                            <span class="tile-title"><?= e($t['title']) ?></span>
+                            <?php if ($t['tag'] !== ''): ?><span class="tile-tag"><?= e($t['tag']) ?></span><?php endif; ?>
+                        </span>
+                        <span class="tile-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></span>
+                    </span>
+                </a>
+                <?php endforeach; ?>
             </div>
-        </article>
+        </section>
         <?php endforeach; ?>
-    </section>
-    <?php endif; ?>
+    </main>
 
+    <?php if (setting('countdown_enabled') === '1'): ?>
     <!-- ============================== COUNTDOWN -->
     <section class="countdown" aria-live="off">
         <p class="countdown-label"><?= e(setting('countdown_label')) ?></p>
@@ -127,8 +97,32 @@ require __DIR__ . '/inc/head.php';
             <svg class="dot-matrix" viewBox="0 0 39.6 12" aria-hidden="true"></svg>
         </div>
     </section>
+    <?php endif; ?>
+
+    <!-- ============================== BOTTOM BANNER -->
+    <a class="deals-banner<?= $bannerImage !== '' ? ' is-image' : '' ?>" href="<?= e($bannerLink) ?>"<?= link_attrs($bannerLink) ?>>
+        <?php if ($bannerImage !== ''): ?>
+        <img src="<?= e(asset($bannerImage)) ?>" alt="<?= e(setting('banner_kicker') . ' ' . setting('banner_title')) ?>" loading="lazy">
+        <?php else: ?>
+        <img class="deco" src="<?= e(asset('assets/img/cloud-3.png')) ?>" alt="" style="--x:86;--y:4;--w:16">
+        <img class="deals-logo" src="<?= e(asset(setting('logo'))) ?>" alt="" loading="lazy">
+        <span class="deals-copy">
+            <span class="deals-kicker"><?= e(setting('banner_kicker')) ?></span>
+            <span class="deals-title"><?= e(setting('banner_title')) ?></span>
+            <span class="deals-cta"><?= e(setting('banner_cta_text')) ?></span>
+        </span>
+        <?php endif; ?>
+    </a>
+
+    <?php if (setting_raw('disclaimer') !== ''): ?>
+    <footer class="disclaimer"><p><?= e_lines(setting_raw('disclaimer')) ?></p></footer>
+    <?php endif; ?>
 
 </div>
+<?php require __DIR__ . '/inc/preview_notice.php'; ?>
+<script src="<?= e(asset('assets/js/store.js')) ?>" defer></script>
+<?php if (setting('countdown_enabled') === '1'): ?>
 <script src="<?= e(asset('assets/js/countdown.js')) ?>" defer></script>
+<?php endif; ?>
 </body>
 </html>

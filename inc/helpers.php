@@ -16,15 +16,13 @@ function e_lines(?string $value): string
     return nl2br(e(trim((string) $value)), false);
 }
 
-/** URL path of the site root, e.g. "/diva/" — works from / and /admin/. */
+/** URL path of the site root, e.g. "/diva/" — works from /, /admin/ and /api/. */
 function base_url(string $path = ''): string
 {
     static $base = null;
     if ($base === null) {
         $dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
-        if (str_ends_with($dir, '/admin')) {
-            $dir = substr($dir, 0, -strlen('/admin'));
-        }
+        $dir = preg_replace('#/(admin|api)$#', '', $dir);
         $base = rtrim($dir, '/') . '/';
     }
     return $base . ltrim($path, '/');
@@ -44,14 +42,14 @@ function asset(string $path): string
     return base_url($path) . $v;
 }
 
-/** Only allow http(s), relative paths and #anchors as link targets. */
+/** Only allow http(s), mailto:, tel:, relative paths and #anchors as link targets. */
 function safe_link(?string $url): string
 {
     $url = trim((string) $url);
     if ($url === '') {
         return '#';
     }
-    if (preg_match('#^https?://#i', $url)) {
+    if (preg_match('#^(https?://|mailto:|tel:)#i', $url)) {
         return $url;
     }
     // Relative paths and anchors are fine; any other scheme (javascript:, data:, …) is not.
@@ -70,6 +68,12 @@ function settings(): array
         $cache = db()->query('SELECT key, value FROM settings')->fetchAll(PDO::FETCH_KEY_PAIR);
     }
     return $cache;
+}
+
+/** Stored value as saved (an empty value stays empty). */
+function setting_raw(string $key): string
+{
+    return settings()[$key] ?? (settings_field($key)['default'] ?? '');
 }
 
 function setting(string $key, string $fallback = ''): string
@@ -94,6 +98,18 @@ function countdown_target(): int
     return $end;
 }
 
+/** Visitor IP as seen by this server (proxies are not trusted). */
+function client_ip(): string
+{
+    return (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+}
+
+/** "450 m" / "1.2 km" (with a non-breaking space) */
+function format_distance(float $meters): string
+{
+    return $meters < 1000 ? round($meters) . "\u{00A0}m" : rtrim(rtrim(number_format($meters / 1000, 1), '0'), '.') . "\u{00A0}km";
+}
+
 /* ------------------------------------------------------------------ session, CSRF, flash */
 
 function start_session(): void
@@ -101,7 +117,7 @@ function start_session(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
-    session_name('diva_admin');
+    session_name('diva_sid');
     session_set_cookie_params([
         'httponly' => true,
         'samesite' => 'Lax',

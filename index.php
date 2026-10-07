@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/inc/helpers.php';
+require_once __DIR__ . '/inc/geofence.php';
+geofence_gate();
 
 $pageTitle = setting('site_title');
 $bodyClass = 'landing';
@@ -28,5 +29,6 @@ require __DIR__ . '/inc/head.php';
         <?= e(setting('landing_cta_text')) ?>
     </a>
 </main>
+<?php require __DIR__ . '/inc/preview_notice.php'; ?>
 </body>
 </html>

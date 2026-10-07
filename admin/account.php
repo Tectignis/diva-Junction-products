@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ->execute([password_hash($new, PASSWORD_DEFAULT), $admin['id']]);
             session_regenerate_id(true);
         }
+        audit_log($admin, 'account.updated', ['username' => $admin['username']], ['username' => $username, 'password_changed' => $new !== '']);
         flash($new !== '' ? 'Account and password updated.' : 'Account updated.');
         redirect('account.php');
     }

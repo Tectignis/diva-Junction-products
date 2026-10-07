@@ -225,6 +225,7 @@ hr {
 
 .content {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
     max-width: 1100px;
     padding: 16px 36px 60px;
@@ -301,56 +302,6 @@ hr {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.thumb.is-blue {
-    border: 2px solid #111;
-    background:
-        linear-gradient(120deg, transparent 41%, #2e55bf 41% 57%, transparent 57% 66%, #2e55bf 66% 71%, transparent 71%),
-        var(--blue);
-}
-
-.thumb.is-blue img {
-    object-fit: contain;
-}
-
-.station-thumb {
-    position: relative;
-    background: transparent;
-    overflow: visible;
-}
-
-.station-thumb::before {
-    content: "";
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    border: 3px solid var(--blue);
-    background: #fffff7;
-    transform: rotate(45deg);
-}
-
-.station-thumb::after {
-    content: "";
-    position: absolute;
-    width: 34px;
-    height: 34px;
-    border: 5px solid var(--magenta);
-    border-radius: 50%;
-}
-
-.station-thumb span {
-    position: relative;
-    z-index: 1;
-    max-width: 62px;
-    padding: 1px 4px;
-    overflow: hidden;
-    background: var(--blue);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 600;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .row-main {
@@ -528,6 +479,7 @@ input[type="text"],
 input[type="password"],
 input[type="number"],
 input[type="datetime-local"],
+input[type="url"],
 input:not([type]),
 select,
 textarea {
@@ -578,13 +530,6 @@ textarea:focus {
     border-radius: 14px;
     background:
         repeating-conic-gradient(#f1f3f9 0 25%, #fff 0 50%) 0 0 / 16px 16px;
-}
-
-.image-preview.is-dark {
-    border: 3px solid #111;
-    background:
-        linear-gradient(120deg, transparent 41%, #2e55bf 41% 57%, transparent 57% 66%, #2e55bf 66% 71%, transparent 71%),
-        var(--blue);
 }
 
 .image-preview img {
@@ -744,49 +689,6 @@ input[type="file"]::file-selector-button {
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 10px 30px rgba(16, 30, 80, 0.15);
     backdrop-filter: blur(8px);
-}
-
-/* station preview on the brand form */
-.station-preview {
-    position: relative;
-    width: 200px;
-    height: 150px;
-    margin: 0 auto;
-}
-
-.station-preview > * {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-}
-
-.sp-diamond {
-    width: 100px;
-    height: 100px;
-    border: 3px solid var(--blue);
-    background: #fffff7;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.sp-ring {
-    width: 76px;
-    height: 76px;
-    border: 11px solid var(--magenta);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.sp-name {
-    min-width: 98px;
-    padding: 1px 6px;
-    background: var(--blue);
-    color: #fff;
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: -0.04em;
-    text-align: center;
-    white-space: nowrap;
-    transform: translate(-50%, -50%);
 }
 
 /* ------------------------------------------------------------- flash */
@@ -1050,5 +952,337 @@ input[type="file"]::file-selector-button {
 
     .savebar .muted {
         display: none;
+    }
+}
+
+/* ------------------------------------------------------------- tiles & forms */
+
+.thumb.is-tile {
+    width: 48px;
+    height: 72px;
+    border-radius: 8px;
+}
+
+.image-preview.is-tile {
+    width: 106px;
+    height: 128px;
+}
+
+.image-preview.is-tile img {
+    object-fit: cover;
+}
+
+.field-bool {
+    grid-column: 1 / -1;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 18px 20px;
+}
+
+.form-actions.start {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.small {
+    font-size: 12.5px;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.input-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.input-row .btn {
+    flex: none;
+}
+
+/* ------------------------------------------------------------- location lock */
+
+.geo-admin {
+    display: grid;
+    gap: 20px;
+}
+
+.geo-switch-card {
+    display: grid;
+    gap: 10px;
+    border: 2px solid var(--line);
+}
+
+.geo-switch-card.is-on {
+    border-color: var(--success);
+    background: linear-gradient(180deg, #f0fbf5, #fff 75%);
+}
+
+.geo-switch-card p {
+    margin: 0;
+}
+
+.geo-switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+}
+
+.geo-switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.geo-switch-track {
+    position: relative;
+    flex: none;
+    width: 64px;
+    height: 36px;
+    border-radius: 999px;
+    background: #c9cfe0;
+    transition: background 0.2s;
+}
+
+.geo-switch-track::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s;
+}
+
+.geo-switch input:checked + .geo-switch-track {
+    background: var(--success);
+}
+
+.geo-switch input:checked + .geo-switch-track::after {
+    transform: translateX(28px);
+}
+
+.geo-switch input:focus-visible + .geo-switch-track {
+    outline: 3px solid #9db4f5;
+    outline-offset: 2px;
+}
+
+.geo-switch-text {
+    display: grid;
+    gap: 4px;
+}
+
+.geo-switch-text strong {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.geo-switch-text small {
+    color: var(--muted);
+    font-size: 13.5px;
+}
+
+.status-pill {
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #e7eaf3;
+    color: #3a4466;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.is-on .status-pill {
+    background: var(--success);
+    color: #fff;
+}
+
+.geo-map {
+    z-index: 0;
+    height: 340px;
+    margin-top: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+}
+
+.map-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin: 10px 0 18px;
+}
+
+.test-result {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 12px;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+}
+
+.test-result strong {
+    font-size: 16px;
+}
+
+.test-result.is-ok,
+.result.is-ok {
+    background: #e2f5ea;
+    color: #0d6644;
+}
+
+.test-result.is-bad,
+.result.is-bad {
+    background: #fde8ec;
+    color: #a61b2f;
+}
+
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 6px 0 14px;
+}
+
+.mini-stats div {
+    display: grid;
+    gap: 2px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg);
+}
+
+.mini-stats strong {
+    font-size: 24px;
+}
+
+.mini-stats span {
+    color: var(--muted);
+    font-size: 12.5px;
+}
+
+.geo-stat .stat-icon {
+    background: #e7eaf3;
+    color: #3a4466;
+}
+
+.geo-stat.is-on .stat-icon {
+    background: var(--success);
+    color: #fff;
+}
+
+/* ------------------------------------------------------------- logs */
+
+.table-card {
+    padding: 0;
+    overflow-x: auto;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.log-table th,
+.log-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.log-table th {
+    background: #fafbfe;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.log-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.log-table small {
+    display: block;
+    margin-top: 3px;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.result {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.diff {
+    display: grid;
+    gap: 3px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.diff .k {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.diff del {
+    color: #a61b2f;
+}
+
+.diff ins {
+    color: #0d6644;
+    text-decoration: none;
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+code {
+    font-size: 12.5px;
+}
+
+@media (max-width: 860px) {
+    .grid-3,
+    .mini-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .input-row {
+        flex-direction: column;
+    }
+
+    .geo-map {
+        height: 280px;
     }
 }

@@ -33,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 continue;
             }
 
+            if ($field['type'] === 'bool') {
+                $save[$key] = isset($_POST[$key]) ? '1' : '0';
+                continue;
+            }
             $value = str_replace("\r\n", "\n", post($key));
             if ($field['type'] === 'url' && ($err = link_error($value))) {
                 $errors[] = $field['label'] . ': ' . $err;
@@ -50,8 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt = db()->prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
+    $before = $after = [];
     foreach ($save as $key => $value) {
         $stmt->execute([$key, $value]);
+        $old = $values[$key] ?? '';
+        if ($old !== $value) {
+            $before[$key] = $old;
+            $after[$key] = $value;
+        }
+    }
+    if ($after) {
+        audit_log($admin, 'settings.updated', $before, $after);
     }
     foreach ($errors as $err) {
         flash($err, 'error');
@@ -86,6 +99,9 @@ admin_header('Site content', 'settings', $admin);
                     break;
                 case 'datetime':
                     echo field_text($key, $field['label'], $value ? date('Y-m-d\TH:i', strtotime($value)) : '', $opt + ['type' => 'datetime-local']);
+                    break;
+                case 'bool':
+                    echo '<div class="field field-bool">' . field_check($key, $field['label'], $value === '1') . '</div>';
                     break;
                 case 'number':
                     echo field_text($key, $field['label'], $value, $opt + ['type' => 'number', 'min' => 0, 'step' => '0.5']);

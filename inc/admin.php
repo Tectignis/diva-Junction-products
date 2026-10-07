@@ -37,7 +37,7 @@ function link_error(string $url): ?string
  */
 function move_row(string $table, int $id, string $dir, string $scopeSql = '', array $scopeArgs = []): void
 {
-    $allowed = ['featured', 'brands', 'products'];
+    $allowed = ['sections', 'tiles'];
     if (!in_array($table, $allowed, true)) {
         return;
     }
@@ -93,6 +93,11 @@ function icon(string $name): string
         'eye'      => '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
         'eye-off'  => '<path d="M3 3l18 18M10.6 5.1A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
         'clock'    => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        'tile'     => '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 16h14"/>',
+        'layers'   => '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+        'pin'      => '<path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/>',
+        'list'     => '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+        'target'   => '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/>',
     ];
     return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
         . ($paths[$name] ?? '') . '</svg>';
@@ -134,9 +139,10 @@ function field_image(string $name, string $label, ?string $current, array $opt =
         ? '<img src="' . e(asset($current)) . '" alt="">'
         : '<span class="image-empty">No image</span>';
     $reset = !empty($opt['resettable']) && $current !== ($opt['default'] ?? null)
-        ? '<label class="check"><input type="checkbox" name="' . e($name) . '_reset" value="1"> Restore original artwork</label>'
+        ? '<label class="check"><input type="checkbox" name="' . e($name) . '_reset" value="1"> '
+            . (($opt['default'] ?? '') === '' ? 'Remove this image' : 'Restore original artwork') . '</label>'
         : '';
-    $class = 'image-preview' . (!empty($opt['dark']) ? ' is-dark' : '');
+    $class = 'image-preview' . (!empty($opt['dark']) ? ' is-dark' : '') . (!empty($opt['tile']) ? ' is-tile' : '');
     return '<div class="field field-image"><span class="label">' . e($label) . '</span>'
         . '<div class="image-row"><div class="' . $class . '" data-preview>' . $preview . '</div>'
         . '<div class="image-input"><input type="file" name="' . e($name) . '" accept="image/png,image/jpeg,image/webp,image/gif" data-preview-input>'

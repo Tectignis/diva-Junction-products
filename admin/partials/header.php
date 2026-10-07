@@ -3,9 +3,10 @@
 $nav = [
     'dashboard' => ['index.php', 'Dashboard', 'grid'],
     'settings'  => ['settings.php', 'Site content', 'type'],
-    'featured'  => ['featured.php', 'Featured', 'star'],
-    'brands'    => ['brands.php', 'Brands', 'sign'],
-    'products'  => ['products.php', 'Products', 'bag'],
+    'sections'  => ['sections.php', 'Sections', 'layers'],
+    'tiles'     => ['tiles.php', 'Tiles', 'tile'],
+    'location'  => ['location.php', 'Location lock', 'pin'],
+    'logs'      => ['logs.php', 'Logs', 'list'],
     'account'   => ['account.php', 'Account', 'user'],
 ];
 ?><!DOCTYPE html>
@@ -14,6 +15,7 @@ $nav = [
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
     <title><?= e($title) ?> · Diva Junction Admin</title>
     <link rel="icon" href="<?= e(asset(setting('logo'))) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/admin.css')) ?>">
@@ -32,7 +34,7 @@ $nav = [
     </nav>
     <div class="sidebar-foot">
         <a href="<?= e(base_url('index.php')) ?>" target="_blank" rel="noopener"><?= icon('external') ?>Landing page</a>
-        <a href="<?= e(base_url('shop.php')) ?>" target="_blank" rel="noopener"><?= icon('external') ?>Product page</a>
+        <a href="<?= e(base_url('shop.php')) ?>" target="_blank" rel="noopener"><?= icon('external') ?>Deals page</a>
         <form method="post" action="logout.php"><?= csrf_field() ?>
             <button type="submit"><?= icon('logout') ?>Log out <span class="who"><?= e($admin['username']) ?></span></button>
         </form>

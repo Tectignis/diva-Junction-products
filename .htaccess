@@ -5,3 +5,12 @@ DirectoryIndex index.php
 <FilesMatch "^(config\.php|README\.md)$">
     Require all denied
 </FilesMatch>
+
+# Production (divadeals.in) must run on HTTPS — browsers only share GPS location with secure pages.
+# Uncomment once the certificate is installed (skip if the host or CDN already redirects).
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteCond %{HTTP:X-Forwarded-Proto} !https
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# </IfModule>

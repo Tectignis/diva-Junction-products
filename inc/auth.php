@@ -37,7 +37,7 @@ function attempt_login(string $username, string $password): ?string
         return 'Too many attempts. Try again in ' . ceil(($lock - time()) / 60) . ' minute(s).';
     }
 
-    $stmt = db()->prepare('SELECT id, password_hash FROM admins WHERE username = ?');
+    $stmt = db()->prepare('SELECT id, username, password_hash FROM admins WHERE username = ?');
     $stmt->execute([$username]);
     $row = $stmt->fetch();
 
@@ -58,7 +58,18 @@ function attempt_login(string $username, string $password): ?string
         db()->prepare('UPDATE admins SET password_hash = ? WHERE id = ?')
             ->execute([password_hash($password, PASSWORD_DEFAULT), $row['id']]);
     }
+    audit_log($row, 'admin.login');
     return null;
+}
+
+/**
+ * Record an admin change. Arrays are stored as JSON; pass only the values that changed.
+ */
+function audit_log(array $admin, string $action, mixed $old = null, mixed $new = null): void
+{
+    $encode = fn($v) => $v === null ? null : (is_string($v) ? $v : json_encode($v, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    db()->prepare('INSERT INTO admin_audit_logs (admin_id, admin_name, action, old_value, new_value, ip_address, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$admin['id'] ?? null, $admin['username'] ?? '', $action, $encode($old), $encode($new), client_ip(), time()]);
 }
 
 function logout(): void
