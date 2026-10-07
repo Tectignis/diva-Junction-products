@@ -1,6 +1,8 @@
 <?php
 /**
  * Every editable site setting, grouped for the admin "Site content" page.
+ * Each group is one tab: nav = heading it sits under, tab = its label,
+ * icon = icon() name, intro = line under the title, page = preview link.
  * type: text | textarea | url | image | datetime | number | bool
  */
 
@@ -8,7 +10,11 @@ function settings_schema(): array
 {
     return [
         'landing' => [
-            'title'  => 'Landing page',
+            'nav'    => 'Landing page',
+            'tab'    => 'Welcome screen',
+            'icon'   => 'home',
+            'intro'  => 'The first screen visitors see: greeting, logo and the button to the deals.',
+            'page'   => 'index.php',
             'fields' => [
                 'landing_hello'    => ['label' => 'Greeting (pink, sparkly)', 'type' => 'text', 'default' => 'Hello, Divas!'],
                 'landing_welcome'  => ['label' => 'Welcome line (blue)', 'type' => 'text', 'default' => 'Welcome to'],
@@ -18,24 +24,36 @@ function settings_schema(): array
             ],
         ],
         'hero' => [
-            'title'  => 'Deals page — header',
+            'nav'    => 'Deals page',
+            'tab'    => 'Header banner',
+            'icon'   => 'image',
+            'intro'  => 'The banner at the top of the deals page.',
+            'page'   => 'shop.php',
             'fields' => [
-                'hero_banner' => ['label' => 'Header banner (1440 × 480)', 'type' => 'image', 'default' => 'assets/img/hero-banner.webp', 'help' => 'Shown full width, as is. No text is placed on top.'],
+                'hero_banner' => ['label' => 'Header banner (1440 × 480)', 'type' => 'image', 'default' => 'assets/img/hero-banner.webp', 'help' => 'Shown whole, with rounded corners. No text is placed on top.', 'wide' => true],
             ],
         ],
         'banner' => [
-            'title'  => 'Deals page — bottom banner',
+            'nav'    => 'Deals page',
+            'tab'    => 'Bottom banner',
+            'icon'   => 'bag',
+            'intro'  => 'The banner under the tiles and the small print at the very bottom.',
+            'page'   => 'shop.php',
             'fields' => [
                 'banner_kicker'   => ['label' => 'Small line (yellow)', 'type' => 'text', 'default' => 'explore more upcoming deals'],
                 'banner_title'    => ['label' => 'Big line', 'type' => 'text', 'default' => 'this Big Billion Days'],
                 'banner_cta_text' => ['label' => 'Button text', 'type' => 'text', 'default' => 'Lesssgo'],
                 'banner_link'     => ['label' => 'Banner link', 'type' => 'url', 'default' => 'https://www.flipkart.com/big-billion-days-store'],
-                'banner_image'    => ['label' => 'Banner artwork (optional, 1440 × 320)', 'type' => 'image', 'default' => '', 'help' => 'Upload a finished banner to use it instead of the texts above.'],
+                'banner_image'    => ['label' => 'Banner artwork (optional, 1440 × 320)', 'type' => 'image', 'default' => '', 'help' => 'Upload a finished banner to use it instead of the texts above.', 'wide' => true],
                 'disclaimer'      => ['label' => 'Disclaimer (page footer)', 'type' => 'textarea', 'default' => 'Products, scenes, characters and their names are fictional and/or representational in nature. All copyrights in the images, logos and products belong to respective copyright holders. All the prices of the products/Offer(s)/Promotion(s) are provided by the participating sellers/brand partners/banking partners on the Flipkart platform. All Offers are for a limited period, limited products and subject to product availability. The offers may be discontinued or rescheduled as per discretion of Flipkart/participating seller/brand.'],
             ],
         ],
         'countdown' => [
-            'title'  => 'Deals page — countdown',
+            'nav'    => 'Deals page',
+            'tab'    => 'Countdown',
+            'icon'   => 'clock',
+            'intro'  => 'An optional timer to the next deals, shown above the bottom banner.',
+            'page'   => 'shop.php',
             'fields' => [
                 'countdown_enabled'      => ['label' => 'Show the countdown above the bottom banner', 'type' => 'bool', 'default' => '0'],
                 'countdown_label'        => ['label' => 'Countdown label', 'type' => 'text', 'default' => 'Next deals in...'],
@@ -44,7 +62,11 @@ function settings_schema(): array
             ],
         ],
         'location' => [
-            'title'  => 'Location check — question',
+            'nav'    => 'Location check',
+            'tab'    => 'Question',
+            'icon'   => 'pin',
+            'intro'  => 'Shown while the browser asks the visitor for their location.',
+            'page'   => 'index.php?screen=ask',
             'fields' => [
                 'ask_line'      => ['label' => 'Small line (blue)', 'type' => 'text', 'default' => 'Just a minute, Diva....'],
                 'ask_question'  => ['label' => 'Question (pink)', 'type' => 'textarea', 'default' => "Are you really on\nDiva Junction?", 'help' => 'Shown while the browser asks for the location. Each line break is kept.'],
@@ -54,7 +76,11 @@ function settings_schema(): array
             ],
         ],
         'result' => [
-            'title'  => 'Location check — results',
+            'nav'    => 'Location check',
+            'tab'    => 'Results',
+            'icon'   => 'check',
+            'intro'  => 'Shown after the check: location confirmed, or not at Diva Junction.',
+            'page'   => 'index.php?screen=success',
             'fields' => [
                 'success_sign'     => ['label' => 'Success sign artwork', 'type' => 'image', 'default' => 'assets/img/sign-success.webp', 'help' => 'Transparent image, 556 px wide; the poles touch the top edge.'],
                 'success_line1'    => ['label' => 'Success — line 1 (blue)', 'type' => 'text', 'default' => 'Location'],
@@ -72,7 +98,11 @@ function settings_schema(): array
             ],
         ],
         'brand' => [
-            'title'  => 'Branding',
+            'nav'    => 'General',
+            'tab'    => 'Branding',
+            'icon'   => 'star',
+            'intro'  => 'Browser title, logo and the Flipkart corner icon used on every page.',
+            'page'   => '',
             'fields' => [
                 'site_title'    => ['label' => 'Browser title', 'type' => 'text', 'default' => 'Diva Junction | The Big Billion Days'],
                 'logo'          => ['label' => 'Diva Junction logo', 'type' => 'image', 'default' => 'assets/img/logo.png', 'help' => 'Transparent PNG, square.'],

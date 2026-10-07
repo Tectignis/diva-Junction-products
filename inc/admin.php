@@ -98,6 +98,9 @@ function icon(string $name): string
         'pin'      => '<path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/>',
         'list'     => '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
         'target'   => '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/>',
+        'home'     => '<path d="m3 11 9-7 9 7"/><path d="M5 9.5V20h14V9.5M10 20v-5h4v5"/>',
+        'image'    => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="m21 15-5-5L5 19"/>',
+        'check'    => '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 9.5"/>',
     ];
     return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
         . ($paths[$name] ?? '') . '</svg>';
@@ -142,7 +145,7 @@ function field_image(string $name, string $label, ?string $current, array $opt =
         ? '<label class="check"><input type="checkbox" name="' . e($name) . '_reset" value="1"> '
             . (($opt['default'] ?? '') === '' ? 'Remove this image' : 'Restore original artwork') . '</label>'
         : '';
-    $class = 'image-preview' . (!empty($opt['dark']) ? ' is-dark' : '') . (!empty($opt['tile']) ? ' is-tile' : '');
+    $class = 'image-preview' . (!empty($opt['dark']) ? ' is-dark' : '') . (!empty($opt['tile']) ? ' is-tile' : '') . (!empty($opt['wide']) ? ' is-wide' : '');
     return '<div class="field field-image"><span class="label">' . e($label) . '</span>'
         . '<div class="image-row"><div class="' . $class . '" data-preview>' . $preview . '</div>'
         . '<div class="image-input"><input type="file" name="' . e($name) . '" accept="image/png,image/jpeg,image/webp,image/gif" data-preview-input>'
