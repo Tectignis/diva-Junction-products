@@ -20,11 +20,7 @@ function settings_schema(): array
         'hero' => [
             'title'  => 'Deals page — header',
             'fields' => [
-                'hero_heading'   => ['label' => 'Heading (blue)', 'type' => 'textarea', 'default' => "There's\nsomething"],
-                'hero_highlight' => ['label' => 'Heading (pink, italic)', 'type' => 'textarea', 'default' => "for every\ndiva!"],
-                'hero_cta_text'  => ['label' => 'Button text', 'type' => 'text', 'default' => 'Hop on!'],
-                'hero_cta_link'  => ['label' => 'Button link', 'type' => 'url', 'default' => '#deals'],
-                'hero_image'     => ['label' => 'Header card artwork (853 × 450)', 'type' => 'image', 'default' => 'assets/img/hero-card.webp', 'help' => 'Keep the left side empty for the heading.'],
+                'hero_banner' => ['label' => 'Header banner (1440 × 480)', 'type' => 'image', 'default' => 'assets/img/hero-banner.webp', 'help' => 'Shown full width, as is. No text is placed on top.'],
             ],
         ],
         'banner' => [

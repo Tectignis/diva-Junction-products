@@ -12,8 +12,6 @@ $sections = array_filter($sections, fn($s) => !empty($tilesBySection[$s['id']]))
 $pageTitle   = setting('site_title');
 $bodyClass   = 'store';
 $bodyStyle   = '';
-$heroLink    = safe_link(setting('hero_cta_link'));
-$fkLink      = safe_link(setting('flipkart_link'));
 $bannerLink  = safe_link(setting('banner_link'));
 $bannerImage = setting_raw('banner_image');
 
@@ -25,31 +23,12 @@ function link_attrs(string $url): string
 
 require __DIR__ . '/inc/head.php';
 ?>
+<!-- ============================== HEADER (full-width banner) -->
+<header class="store-hero">
+    <h1><img src="<?= e(asset(setting('hero_banner'))) ?>" alt="Flipkart The Big Billion Days — Diva Junction" width="1440" height="480" fetchpriority="high"></h1>
+</header>
+
 <div class="store-page">
-
-    <!-- ============================== HEADER (same artwork as the microsite) -->
-    <header class="store-hero">
-        <img class="deco" src="<?= e(asset('assets/img/cloud-1.png')) ?>" alt="" style="--x:0;--y:62;--w:30">
-        <img class="deco" src="<?= e(asset('assets/img/bird-1.png')) ?>" alt="" style="--x:6;--y:52;--w:8">
-        <img class="deco" src="<?= e(asset('assets/img/bird-2.png')) ?>" alt="" style="--x:91;--y:86;--w:6">
-
-        <a class="corner-icon" href="<?= e($fkLink) ?>"<?= link_attrs($fkLink) ?>>
-            <img src="<?= e(asset(setting('flipkart_icon'))) ?>" alt="Flipkart">
-        </a>
-
-        <img class="store-logo" src="<?= e(asset(setting('logo'))) ?>" alt="Diva Junction">
-
-        <div class="hero-card">
-            <img class="hero-art" src="<?= e(asset(setting('hero_image'))) ?>" alt="" fetchpriority="high">
-            <div class="hero-copy">
-                <h1>
-                    <span class="hero-line"><?= e_lines(setting('hero_heading')) ?></span>
-                    <em class="hero-line"><?= e_lines(setting('hero_highlight')) ?></em>
-                </h1>
-                <a class="hero-pill" href="<?= e($heroLink) ?>"<?= link_attrs($heroLink) ?>><?= e(setting('hero_cta_text')) ?></a>
-            </div>
-        </div>
-    </header>
 
     <!-- ============================== SECTIONS OF TILES -->
     <main id="deals">

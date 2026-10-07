@@ -53,7 +53,7 @@ admin_header('Dashboard', 'dashboard', $admin);
         <span><strong>Landing page</strong><small><?= e(setting('landing_cta_text')) ?> → <?= e(setting('landing_cta_link')) ?></small></span>
     </a>
     <a class="card preview" href="<?= e(base_url('shop.php')) ?>" target="_blank" rel="noopener">
-        <img src="<?= e(asset(setting('hero_image'))) ?>" alt="">
+        <img src="<?= e(asset(setting('hero_banner'))) ?>" alt="">
         <span><strong>Deals page</strong><small>Header, sections of tiles &amp; bottom banner</small></span>
     </a>
 </section>

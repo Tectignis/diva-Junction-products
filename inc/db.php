@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/settings_schema.php';
 
 /** Bump when migrate() gains a new versioned step. */
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 function db(): PDO
 {
@@ -142,6 +142,10 @@ function migrate(PDO $pdo): void
             settings_field('geo_privacy')['default'],
             'We use your location only to check that you are at Diva Junction. It is never shared, and we keep only an approximate copy for a limited time.',
         ]);
+    }
+    if ($version < 5) {
+        // v5: the deals-page header became one full-width banner image.
+        $pdo->exec("DELETE FROM settings WHERE key IN ('hero_heading', 'hero_highlight', 'hero_cta_text', 'hero_cta_link', 'hero_image')");
     }
     if ($version < SCHEMA_VERSION) {
         $pdo->exec('PRAGMA user_version = ' . SCHEMA_VERSION);

@@ -573,130 +573,19 @@ a {
 
 /* ------------------------------------------------------------- header */
 
+/* one 1440 × 480 banner, edge to edge, shown whole */
 .store-hero {
-    position: relative;
-    aspect-ratio: 1080 / 860;
-    overflow: hidden;
-    border-radius: clamp(14px, 2.4vw, 22px);
-    background: linear-gradient(180deg, #e4e9f8 0%, var(--lavender) 55%, #cad6f3 100%);
+    background: var(--lavender);
 }
 
-.store-hero .corner-icon {
-    top: 4.5%;
-    right: 4.5%;
-    width: 10%;
-    border-radius: 18%;
-}
-
-.store-logo {
-    position: absolute;
-    z-index: 3;
-    top: 5.2%;
-    left: 50%;
-    width: 36.6%;
-    height: auto;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 6px 10px rgba(30, 20, 90, 0.16));
-}
-
-.hero-card {
-    position: absolute;
-    z-index: 2;
-    top: 42.7%;
-    left: 50%;
-    width: 79%;
-    aspect-ratio: 853 / 450;
-    overflow: hidden;
-    border-radius: 4.4% / 8.4%;
-    background: #f0f3fb;
-    transform: translateX(-50%);
-    container-type: inline-size;
-    --c: calc(100cqw / 853);
-}
-
-.hero-art {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.hero-copy {
-    position: absolute;
-    top: calc(41 * var(--c));
-    left: calc(43 * var(--c));
-}
-
-.hero-copy h1 {
+.store-hero h1 {
     margin: 0;
-    font-size: calc(65 * var(--c));
-    font-weight: 700;
-    line-height: calc(69 * var(--c));
-    letter-spacing: -0.04em;
 }
 
-.hero-line {
+.store-hero img {
     display: block;
-    color: var(--blue-ink);
-}
-
-em.hero-line {
-    color: var(--magenta);
-    font-style: italic;
-}
-
-.hero-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: calc(161 * var(--c));
-    height: calc(59 * var(--c));
-    margin: calc(15 * var(--c)) 0 0 calc(-38 * var(--c));
-    padding: 0 calc(26 * var(--c)) calc(1 * var(--c));
-    border-radius: 999px;
-    background: #143ca9;
-    color: var(--cream);
-    font-size: calc(30 * var(--c));
-    font-style: italic;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    word-spacing: -0.15em;
-    white-space: nowrap;
-    transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-.hero-pill:hover {
-    filter: brightness(1.15);
-    transform: translateY(-2px);
-}
-
-/* wide screens: a 1440 × 480 banner — logo left, card right */
-@media (min-width: 800px) {
-    .store-hero {
-        aspect-ratio: 1440 / 480;
-    }
-
-    .store-hero .corner-icon {
-        top: 7%;
-        right: 2%;
-        width: 5%;
-    }
-
-    .store-logo {
-        top: 50%;
-        left: 9%;
-        width: 26%;
-        transform: translateY(-50%);
-    }
-
-    .hero-card {
-        top: 50%;
-        right: 8.5%;
-        left: auto;
-        width: 53%;
-        transform: translateY(-50%);
-    }
+    width: 100%;
+    height: auto;
 }
 
 /* ------------------------------------------------------------- sections */
