@@ -573,8 +573,10 @@ a {
 
 /* ------------------------------------------------------------- header */
 
-/* one 1440 × 480 banner, edge to edge, shown whole */
+/* one 1440 × 480 banner, shown whole, with the page gap around it */
 .store-hero {
+    overflow: hidden;
+    border-radius: clamp(10px, 1.6vw, 16px);
     background: var(--lavender);
 }
 

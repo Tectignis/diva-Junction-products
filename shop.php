@@ -23,12 +23,12 @@ function link_attrs(string $url): string
 
 require __DIR__ . '/inc/head.php';
 ?>
-<!-- ============================== HEADER (full-width banner) -->
-<header class="store-hero">
-    <h1><img src="<?= e(asset(setting('hero_banner'))) ?>" alt="Flipkart The Big Billion Days — Diva Junction" width="1440" height="480" fetchpriority="high"></h1>
-</header>
-
 <div class="store-page">
+
+    <!-- ============================== HEADER (banner artwork, shown whole) -->
+    <header class="store-hero">
+        <h1><img src="<?= e(asset(setting('hero_banner'))) ?>" alt="Flipkart The Big Billion Days — Diva Junction" width="1440" height="480" fetchpriority="high"></h1>
+    </header>
 
     <!-- ============================== SECTIONS OF TILES -->
     <main id="deals">
