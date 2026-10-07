@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/settings_schema.php';
 
 /** Bump when migrate() gains a new versioned step. */
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 function db(): PDO
 {
@@ -134,6 +134,14 @@ function migrate(PDO $pdo): void
     }
     if ($version < 3) {
         migrate_legacy_geofence($pdo);
+    }
+    if ($version < 4) {
+        // v4: the location check became the 5-screen flow on the landing page.
+        $pdo->exec("DELETE FROM settings WHERE key IN ('landing_tagline', 'geo_title', 'geo_message')");
+        $pdo->prepare("UPDATE settings SET value = ? WHERE key = 'geo_privacy' AND value = ?")->execute([
+            settings_field('geo_privacy')['default'],
+            'We use your location only to check that you are at Diva Junction. It is never shared, and we keep only an approximate copy for a limited time.',
+        ]);
     }
     if ($version < SCHEMA_VERSION) {
         $pdo->exec('PRAGMA user_version = ' . SCHEMA_VERSION);

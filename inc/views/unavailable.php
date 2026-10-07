@@ -3,24 +3,25 @@
  * Shown when the location settings cannot be read. Deliberately uses no database
  * access, so it renders even when SQLite is unavailable.
  */
+$h = fn(string $path) => htmlspecialchars(base_url($path), ENT_QUOTES);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Back in a moment · Diva Junction</title>
-    <link rel="stylesheet" href="<?= htmlspecialchars(base_url('assets/css/site.css'), ENT_QUOTES) ?>">
+    <link rel="stylesheet" href="<?= $h('assets/css/site.css') ?>">
 </head>
-<body class="geo">
-<main class="geo-screen">
-    <div class="geo-card">
-        <img class="geo-logo" src="<?= htmlspecialchars(base_url('assets/img/logo.png'), ENT_QUOTES) ?>" alt="Diva Junction">
-        <section class="geo-panel">
-            <h1>We'll be right back</h1>
-            <p>Diva Junction is temporarily unavailable. Please try again in a minute.</p>
-            <div class="geo-actions"><a class="geo-btn" href="">Try Again</a></div>
+<body class="landing">
+<div class="flow" data-screen="error">
+    <main class="check">
+        <section class="check-card is-result">
+            <img class="check-sign" src="<?= $h('assets/img/sign-fail.webp') ?>" alt="Oh no, Diva!" width="556" height="329">
+            <h1 class="check-lines"><span class="line-sm">We'll be</span><span class="line-xl">Right Back!</span></h1>
+            <p class="check-msg">Diva Junction is taking a short break. Please try again in a minute.</p>
+            <a class="pill-btn" href="">Try Again</a>
         </section>
-    </div>
-</main>
+    </main>
+</div>
 </body>
 </html>

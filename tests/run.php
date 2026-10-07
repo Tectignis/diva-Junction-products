@@ -250,6 +250,13 @@ function request(string $method, string $url, ?string $body = null, array $heade
 if ($http) {
     [$s, $body] = request('GET', $http . 'api/geofence/status');
     check('http: GET status → 200 JSON', $s === 200 && array_key_exists('enabled', (array) json_decode($body, true)), "$s $body");
+    $locked = (bool) (json_decode($body, true)['enabled'] ?? false);
+    [$s] = request('GET', $http);
+    check('http: landing page always opens → 200', $s === 200, (string) $s);
+    [$s, $page, $h] = request('GET', $http . 'shop.php');
+    check($locked ? 'http: deals page without a pass → landing page, nothing of it sent' : 'http: deals page opens while the lock is OFF',
+        $locked ? $s === 302 && (bool) preg_grep('#^Location: .*index\.php#i', $h) && !str_contains($page, 'store-section') : $s === 200,
+        (string) $s);
     [$s] = request('GET', $http . 'api/admin/geofence');
     check('http: admin settings without login → 401', $s === 401, (string) $s);
     [$s] = request('PUT', $http . 'api/admin/geofence', '{"enabled":false}', ['Content-Type: application/json']);

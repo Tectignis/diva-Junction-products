@@ -2,9 +2,9 @@
 
 Diva Junction microsite (divadeals.in) — pure PHP 8.2 + SQLite, no frameworks.
 
-- **Landing page** (`index.php`) — the station poster from the 1080 px reference design in `docs/`.
+- **Landing page** (`index.php`) — the "Hello, Divas!" station poster. Always open; while the location lock is ON, **Get Started** runs the location check (the client's 5 screens: welcome → "Are you really on Diva Junction?" → Checking… → "Yaaas, Diva!" or "Oh no, Diva!").
 - **Deals page** (`shop.php`) — laid out like the Flipkart "GenZ" store: the Diva Junction header banner, a swipeable **Featured** row, a **Women** grid of category tiles, the "explore more upcoming deals" banner and the disclaimer. Content comes from the client's *Diva Jn Deals Store Wireframe* sheet.
-- **Location lock** — when switched on, the public pages open only for visitors within a set radius (default 500 m) of the activation. The admin panel works from anywhere.
+- **Location lock** — when switched on, the deals page opens only for visitors who confirmed they are within a set radius (default 500 m) of the activation. The admin panel works from anywhere.
 
 ## Run
 
@@ -21,10 +21,10 @@ The database `data/diva.sqlite` is created and filled with the client's content 
 | Section       | What you can edit |
 |---------------|-------------------|
 | Dashboard     | Location lock status, location checks in the last 24 h, live sections and tiles |
-| Site content  | Landing texts, header heading/button/artwork, bottom banner texts or artwork, disclaimer, optional countdown, location-screen texts and support link, logo, corner icon |
+| Site content  | Landing texts and artwork, header heading/button/artwork, bottom banner texts or artwork, disclaimer, optional countdown, every text and artwork of the location-check screens, support link, logo, corner icon |
 | Sections      | Rows on the deals page: title, layout (swipeable row or grid). Reorder, hide or delete (deleting a section also removes its tiles) |
 | Tiles         | 424 × 640 tiles: section, title, hashtag line, photo, link. Reorder, hide or delete |
-| Location lock | ON/OFF switch, location name, Google Maps link → coordinates, latitude/longitude on a map, radius, GPS accuracy needed, re-check period, log retention; a tool to test any coordinate |
+| Location lock | ON/OFF switch, location name, Google Maps link → coordinates, latitude/longitude on a map, radius, GPS accuracy needed, re-check period, log retention; previews of the visitor screens; a tool to test any coordinate |
 | Logs          | Every location check (allowed/blocked, distance, accuracy, rounded position, device) and every admin change with old → new values |
 | Account       | Username and password |
 
@@ -32,19 +32,19 @@ The database `data/diva.sqlite` is created and filled with the client's content 
 
 How it works:
 
-1. A visitor opens a public page. If the lock is OFF, the page is served as usual.
-2. If it is ON and this browser has no valid approval, the server sends the branded **Location Access Required** screen instead of the page (HTTP 403). Nothing of the page is sent, so turning off JavaScript or editing the page does not help.
-3. The visitor taps **Enable Location**. The browser asks for permission, and the page sends latitude, longitude and accuracy to `POST api/geofence/validate`.
+1. A visitor opens the landing page (always open). If the lock is OFF, or this browser is already approved, **Get Started** goes straight to the deals page.
+2. Otherwise **Get Started** shows "Are you really on Diva Junction?" while the browser asks for permission, then **Checking…**, and the page sends latitude, longitude and accuracy to `POST api/geofence/validate`.
+3. Opening `shop.php` without a valid approval sends the visitor back to the landing page (HTTP 302). Nothing of the deals page is sent, so turning off JavaScript or editing the page does not help.
 4. The server measures the distance to the configured centre (Haversine) and decides:
    - allowed when the distance is ≤ the radius and the GPS accuracy is within the limit;
    - `poor_accuracy` when the fix is less precise than the limit (the visitor is asked to retry) — unless it is outside the radius even allowing for that error, which is `outside_radius`.
-5. On success the approval is stored in the visitor's server-side session for the re-check period (default 30 min) and the page reloads. Any saved change to the lock settings invalidates all approvals at once.
+5. On success the approval is stored in the visitor's server-side session for the re-check period (default 30 min) and **Yaaas, Diva!** offers **Explore Now**. Outside the area, **Oh no, Diva!** offers **Get to Diva Junction** (Google Maps directions to the pin, or the link set in Site content). Any saved change to the lock settings invalidates all approvals at once.
 
 Other behaviour:
 
-- Signed-in admins can preview the public pages from anywhere; a notice at the bottom says so.
+- Signed-in admins can open the deals page from anywhere (a notice at the bottom says so) and preview every visitor screen with `index.php?screen=ask|checking|success|outside|denied|…` (links in the strip at the bottom of the landing page and on **Admin → Location lock**).
 - If the settings cannot be read (e.g. the database is unavailable), public pages show a "back in a moment" page (HTTP 503) — never the open site.
-- The visitor screen handles: permission denied (with Android/iPhone steps), GPS off, timeout, poor accuracy, outside the area, too many attempts, non-HTTPS pages and old browsers. Every problem screen has **Try Again** and **Contact Support**.
+- Besides "not there", the "Oh no, Diva!" card handles: permission blocked (with Android/iPhone steps), GPS off, timeout, poor accuracy, too many attempts, non-HTTPS pages and old browsers. These have **Try Again** and the support link.
 - Location checks are rate-limited: 10 per browser session and 150 per IP address per 10 minutes (`config.php`).
 - Privacy: coordinates are stored rounded to 4 decimals (~11 m), IPs only as a keyed hash, and records are deleted after the retention period (default 30 days).
 
@@ -80,7 +80,8 @@ php tests/run.php --http=http://localhost/diva/    # + checks against the runnin
 ## Structure
 
 ```
-index.php, shop.php     public pages (both call geofence_gate() first)
+index.php               landing page + location-check screens (assets/js/geofence.js)
+shop.php                deals page (calls geofence_gate() first)
 api/                    JSON API (router + rewrite rules)
 admin/                  admin panel (login, CRUD pages, location lock, logs)
 inc/                    db + migrations/seed, helpers, auth, geofence, views   (web access denied)
@@ -96,4 +97,4 @@ tests/                  automated checks                                        
 - The deals page follows the Flipkart store grid: 424 × 640 tiles (photo on top, caption bar with the title, hashtag and arrow). Featured is a swipeable row with arrows on desktop; grids show 2 columns on phones, 3 on tablets and 4 on desktop.
 - Tile photos are only the photo part — the caption is HTML, so titles stay editable. The client's reuse tiles were cropped to their photo; product photos from the sheet's Flipkart links were fitted to the same ratio.
 - The header uses the microsite artwork: stacked logo + card on phones, a 1440 × 480 banner (logo left, card right) from 800 px up.
-- The landing page uses design units: `--u` = 1/1080 of the poster width, so it scales exactly like the mockup.
+- The landing page and the location-check screens use design units: `--u` = 1/1080 of the poster width, so they scale exactly like the 1080 × 1920 mockups. The artwork (`landing-bg`, `ask-bg`, `sign-success`, `sign-fail`) is the client's screens with the texts removed; all texts are HTML and editable.

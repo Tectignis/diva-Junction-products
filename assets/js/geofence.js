@@ -1,40 +1,77 @@
-/* Diva Junction — location check. The browser only reports its position; the server decides. */
+/* Diva Junction — location check on the landing page.
+   Get Started → "Are you really on Diva Junction?" (the browser asks for the location)
+   → Checking… → success or "Oh no, Diva!". The browser only reports its position;
+   the server decides and grants the pass that opens the deals page. */
 (function () {
     'use strict';
 
-    var root = document.querySelector('[data-geo]');
-    if (!root) return;
+    var flow = document.querySelector('[data-flow]');
+    if (!flow) return;
 
-    var api = root.getAttribute('data-api');
-    var limit = Number(root.getAttribute('data-accuracy-limit')) || 100;
+    var api = flow.getAttribute('data-api');
+    var limit = Number(flow.getAttribute('data-accuracy-limit')) || 100;
+    var ASK_MS = 1600;      // the question stays at least this long
+    var CHECK_MS = 1200;    // "Checking…" stays at least this long
     var SETTLE_MS = 8000;   // after a rough first fix, wait this long for a sharper one
-    var GIVE_UP_MS = 25000; // no usable fix at all by then → timeout
+    var GIVE_UP_MS = 60000; // safety net; the browser's own timeout (20 s after permission) normally fires first
     var busy = false;
-
-    function show(state, vars) {
-        Object.keys(vars || {}).forEach(function (key) {
-            root.querySelectorAll('[data-var="' + key + '"]').forEach(function (el) {
-                el.textContent = vars[key];
-            });
-        });
-        root.querySelectorAll('[data-panel]').forEach(function (panel) {
-            panel.hidden = panel.getAttribute('data-panel') !== state;
-        });
-        root.setAttribute('data-state', state);
-    }
+    var queue = Promise.resolve();
 
     function distance(m) {
         return m < 1000 ? Math.round(m) + ' m' : (m / 1000).toFixed(1).replace(/\.0$/, '') + ' km';
     }
 
-    function locate() {
+    function show(screen, vars) {
+        Object.keys(vars || {}).forEach(function (key) {
+            flow.querySelectorAll('[data-var="' + key + '"]').forEach(function (el) {
+                el.textContent = vars[key];
+            });
+        });
+        flow.setAttribute('data-screen', screen);
+        flow.querySelectorAll('[data-panel]').forEach(function (panel) {
+            panel.hidden = panel.getAttribute('data-panel') !== screen;
+        });
+        var heading = flow.querySelector('[data-panel="' + screen + '"] [tabindex="-1"]') ||
+            (screen === 'ask' && document.getElementById('ask-title'));
+        if (heading) heading.focus({ preventScroll: true });
+    }
+
+    /** Show a screen once the previous one has been up for its minimum time. */
+    function step(screen, vars, holdMs) {
+        queue = queue.then(function () {
+            show(screen, vars);
+            return new Promise(function (resolve) { setTimeout(resolve, holdMs || 0); });
+        });
+    }
+
+    function begin(withQuestion) {
         if (busy) return;
-        if (!window.isSecureContext) return show('insecure');
-        if (!('geolocation' in navigator)) return show('unsupported');
-
+        if (!window.isSecureContext) return step('insecure');
+        if (!('geolocation' in navigator)) return step('unsupported');
         busy = true;
-        show('locating');
 
+        var checking = false;
+        function toChecking() {
+            if (!checking) {
+                checking = true;
+                step('checking', null, CHECK_MS);
+            }
+        }
+
+        if (withQuestion) step('ask', null, ASK_MS);
+        else toChecking();
+
+        locate(toChecking, function (coords) {
+            toChecking();
+            send(coords);
+        }, function (screen) {
+            busy = false;
+            step(screen);
+        });
+    }
+
+    /** Watch the position until it is precise enough (or SETTLE_MS after the first fix). */
+    function locate(onFirstFix, onDone, onFail) {
         var best = null;
         var finished = false;
         var settleTimer = null;
@@ -46,6 +83,7 @@
         });
 
         function onPosition(pos) {
+            if (!best) onFirstFix();
             if (!best || pos.coords.accuracy < best.coords.accuracy) best = pos;
             if (best.coords.accuracy <= limit) return finish();
             if (!settleTimer) settleTimer = setTimeout(finish, SETTLE_MS);
@@ -62,9 +100,8 @@
             navigator.geolocation.clearWatch(watchId);
             clearTimeout(settleTimer);
             clearTimeout(giveUpTimer);
-            if (best && !(err && err.code === 1)) return send(best.coords);
-            busy = false;
-            show(!err || err.code === 3 ? 'timeout' : err.code === 1 ? 'denied' : 'unavailable');
+            if (best && !(err && err.code === 1)) return onDone(best.coords);
+            onFail(!err || err.code === 3 ? 'timeout' : err.code === 1 ? 'denied' : 'unavailable');
         }
     }
 
@@ -84,33 +121,30 @@
                 busy = false;
                 var d = res.data;
                 if (d.allowed) {
-                    show('granted');
-                    window.location.reload();
+                    step('success');
                 } else if (res.status === 429 || d.reason === 'rate_limited') {
-                    show('rate');
+                    step('rate');
                 } else if (d.reason === 'outside_radius') {
-                    show('outside', { distance: distance(d.distance_meters) });
+                    step('outside');
                 } else if (d.reason === 'poor_accuracy') {
-                    show('accuracy', { accuracy: distance(coords.accuracy), limit: distance(d.accuracy_limit_meters || limit) });
+                    step('accuracy', { accuracy: distance(coords.accuracy), limit: distance(d.accuracy_limit_meters || limit) });
                 } else {
-                    show('error');
+                    step('error');
                 }
             })
             .catch(function () {
                 busy = false;
-                show('error');
+                step('error');
             });
     }
 
-    root.addEventListener('click', function (event) {
-        if (event.target.closest('[data-action="locate"]')) locate();
+    flow.addEventListener('click', function (event) {
+        if (event.target.closest('[data-action="start"]') && flow.hasAttribute('data-locked')) {
+            event.preventDefault();
+            begin(true);
+        } else if (event.target.closest('[data-action="retry"]')) {
+            event.preventDefault();
+            begin(false);
+        }
     });
-
-    // Permission already granted (e.g. a returning visitor): check straight away.
-    if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'geolocation' }).then(function (status) {
-            if (status.state === 'granted') locate();
-            else if (status.state === 'denied') show('denied');
-        }).catch(function () { /* not supported — wait for the button */ });
-    }
 })();

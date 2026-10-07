@@ -94,10 +94,10 @@ foreach ($errors as $err): ?>
             <span class="geo-switch-track" aria-hidden="true"></span>
             <span class="geo-switch-text">
                 <strong>Location restriction <span class="status-pill" data-on="ON" data-off="OFF"><?= $cfg['enabled'] ? 'ON' : 'OFF' ?></span></strong>
-                <small data-on-text="Visitors must be within the radius below to open the site. The admin panel always works from anywhere."
-                       data-off-text="Anyone, anywhere can open the site. Turn on to limit it to the area below."><?= $form['enabled']
-                    ? 'Visitors must be within the radius below to open the site. The admin panel always works from anywhere.'
-                    : 'Anyone, anywhere can open the site. Turn on to limit it to the area below.' ?></small>
+                <small data-on-text="Visitors must confirm they are within the radius below (Get Started on the landing page) before the deals page opens. The admin panel always works from anywhere."
+                       data-off-text="Anyone, anywhere can open the deals page. Turn on to limit it to the area below."><?= $form['enabled']
+                    ? 'Visitors must confirm they are within the radius below (Get Started on the landing page) before the deals page opens. The admin panel always works from anywhere.'
+                    : 'Anyone, anywhere can open the deals page. Turn on to limit it to the area below.' ?></small>
             </span>
         </label>
         <?php if ($cfg['updated_at']): ?>
@@ -108,7 +108,7 @@ foreach ($errors as $err): ?>
     <section class="card">
         <h2>Allowed area</h2>
         <div class="grid-2">
-            <?= field_text('location_name', 'Location name', $form['location_name'], ['maxlength' => 120, 'placeholder' => 'Diva Junction activation, Diva station', 'help' => 'Shown to visitors on the location screen.']) ?>
+            <?= field_text('location_name', 'Location name', $form['location_name'], ['maxlength' => 120, 'placeholder' => 'Diva Junction activation, Diva station', 'help' => 'For the admin and logs.']) ?>
             <div class="field">
                 <span class="label">Google Maps link (optional)</span>
                 <div class="input-row">
@@ -140,6 +140,16 @@ foreach ($errors as $err): ?>
         <button type="submit" class="btn btn-primary">Save settings</button>
     </div>
 </form>
+
+<section class="card">
+    <h2>Visitor screens</h2>
+    <p class="muted">What visitors see after tapping Get Started. Texts and artwork: <a href="settings.php#location">Site content</a>.</p>
+    <div class="quick">
+        <?php foreach (['welcome' => 'Welcome', 'ask' => 'Question', 'checking' => 'Checking', 'success' => 'Success', 'outside' => 'Not there', 'denied' => 'Location blocked'] as $screen => $label): ?>
+        <a class="btn btn-sm" href="<?= e(base_url('index.php?screen=' . $screen)) ?>" target="_blank" rel="noopener"><?= e($label) ?></a>
+        <?php endforeach; ?>
+    </div>
+</section>
 
 <section class="card" id="test">
     <h2>Test a location</h2>

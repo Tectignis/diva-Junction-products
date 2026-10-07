@@ -151,37 +151,57 @@ function geofence_grant(array $cfg): void
 }
 
 /**
- * Call at the top of every public page, before any output. When the restriction
- * is ON and this visitor has no valid pass, the location screen is shown instead.
- * Signed-in admins may preview the site from anywhere.
+ * Lock state for this visitor. When it cannot be read (e.g. the database is
+ * unavailable) the "back in a moment" page is sent instead — never an open site.
+ *
+ * @return array{enabled: bool, pass: bool, admin: bool, cfg: array}
  */
-function geofence_gate(): void
+function geofence_visitor(): array
 {
     try {
         $cfg = geofence_config();
-        if (!$cfg['enabled']) {
-            return;
+        $admin = current_admin() !== null;
+        if ($cfg['enabled']) {
+            header('Cache-Control: no-store, private');
         }
-        header('Cache-Control: no-store, private');
-        if (current_admin()) {
-            $GLOBALS['geo_admin_preview'] = true;
-            return;
-        }
-        if (geofence_has_pass($cfg)) {
-            return;
-        }
+        return ['enabled' => $cfg['enabled'], 'pass' => $cfg['enabled'] && geofence_has_pass($cfg), 'admin' => $admin, 'cfg' => $cfg];
     } catch (Throwable $ex) {
-        // Never fall back to an open site when the restriction state is unknown.
         error_log('Diva Junction geofence: ' . $ex->getMessage());
         http_response_code(503);
         header('Retry-After: 60');
         require __DIR__ . '/views/unavailable.php';
         exit;
     }
+}
 
-    http_response_code(403);
-    require __DIR__ . '/views/location.php';
-    exit;
+/**
+ * Call at the top of every deals page, before any output. When the restriction
+ * is ON and this visitor has no valid pass, nothing of the page is sent: they go
+ * to the landing page, where "Get Started" runs the location check.
+ * Signed-in admins may preview the deals from anywhere.
+ */
+function geofence_gate(): void
+{
+    $geo = geofence_visitor();
+    if (!$geo['enabled']) {
+        return;
+    }
+    if ($geo['admin']) {
+        $GLOBALS['geo_admin_preview'] = true;
+        return;
+    }
+    if (!$geo['pass']) {
+        redirect(base_url('index.php'));
+    }
+}
+
+/** Google Maps directions to the lock's centre (for visitors outside the area). */
+function geofence_directions_link(array $cfg): string
+{
+    if ($cfg['latitude'] !== null && $cfg['longitude'] !== null) {
+        return 'https://www.google.com/maps/dir/?api=1&destination=' . $cfg['latitude'] . ',' . $cfg['longitude'];
+    }
+    return $cfg['maps_url'] !== '' ? $cfg['maps_url'] : 'https://www.google.com/maps/search/?api=1&query=Diva+Junction';
 }
 
 /* ------------------------------------------------------------------ access log + rate limit */
