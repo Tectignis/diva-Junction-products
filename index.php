@@ -25,7 +25,6 @@ $current = $preview ?: 'welcome';
 $dealsLink = safe_link(setting('landing_cta_link'));
 $fkLink    = safe_link(setting('flipkart_link'));
 $failLink  = setting_raw('fail_cta_link') !== '' ? safe_link(setting_raw('fail_cta_link')) : geofence_directions_link($cfg);
-$support   = setting_raw('support_link') !== '' ? safe_link(setting_raw('support_link')) : '';
 $privacy   = setting_raw('geo_privacy');
 
 /** target/rel attributes for outbound links */
@@ -37,7 +36,6 @@ function link_attrs(string $url): string
 /** One "Oh no, Diva!" problem card: sign, pin, texts and the Try Again button. */
 function problem_card(string $panel, string $current, string $line, string $big, string $message, bool $retry = true, string $extra = ''): string
 {
-    global $support;
     $html = '<section class="check-card is-result" data-panel="' . $panel . '" aria-labelledby="t-' . $panel . '"' . ($panel === $current ? '' : ' hidden') . '>'
         . '<img class="check-sign" src="' . e(asset(setting('fail_sign'))) . '" alt="Oh no, Diva!" width="556" height="329">'
         . pin_icon()
@@ -45,9 +43,6 @@ function problem_card(string $panel, string $current, string $line, string $big,
         . '<p class="check-msg">' . $message . '</p>' . $extra;
     if ($retry) {
         $html .= '<button type="button" class="pill-btn" data-action="retry">Try Again</button>';
-        if ($support !== '') {
-            $html .= '<a class="check-link" href="' . e($support) . '"' . link_attrs($support) . '>' . e(setting('support_text')) . '</a>';
-        }
     }
     return $html . '</section>';
 }

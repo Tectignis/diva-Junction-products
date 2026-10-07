@@ -73,8 +73,6 @@ function settings_schema(): array
                 'fail_message'     => ['label' => 'Not there — message', 'type' => 'textarea', 'default' => "Deals are there.\nAnd you are here?!"],
                 'fail_cta_text'    => ['label' => 'Not there — button text', 'type' => 'text', 'default' => 'Get to Diva Junction'],
                 'fail_cta_link'    => ['label' => 'Not there — button link', 'type' => 'url', 'default' => '', 'help' => 'Leave empty to open Google Maps directions to the Location lock pin.'],
-                'support_text'     => ['label' => 'Support link text', 'type' => 'text', 'default' => 'Contact Support'],
-                'support_link'     => ['label' => 'Support link', 'type' => 'url', 'default' => 'https://www.flipkart.com/helpcentre', 'help' => 'Shown under Try Again on the problem screens. A web address, mailto:someone@example.com or tel:+91…. Leave empty to hide it.'],
             ],
         ],
         'brand' => [

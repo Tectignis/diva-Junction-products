@@ -733,20 +733,19 @@ em.hero-line {
     background: var(--magenta);
 }
 
+/* phones and tablets: rows of 4 tiles, each row swiped sideways on its own */
 .tiles {
     display: grid;
-    gap: var(--gap);
+    row-gap: calc(var(--gap) - 8px);
 }
 
-.is-grid .tiles {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.is-carousel .tiles {
+.tile-row {
+    display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 44%;
+    gap: var(--gap);
     margin: 0 calc(-1 * var(--gutter));
-    padding: 4px var(--gutter) 10px;
+    padding: 4px var(--gutter);
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
@@ -754,7 +753,8 @@ em.hero-line {
     scrollbar-width: none;
 }
 
-.is-carousel .tiles::-webkit-scrollbar {
+.tiles::-webkit-scrollbar,
+.tile-row::-webkit-scrollbar {
     display: none;
 }
 
@@ -797,25 +797,37 @@ em.hero-line {
 }
 
 @media (min-width: 600px) {
-    .is-grid .tiles {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .is-carousel .tiles {
+    .tile-row {
         grid-auto-columns: 30%;
     }
 }
 
 @media (min-width: 900px) {
-    .is-grid .tiles {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+    .tiles {
+        gap: var(--gap);
     }
 
-    .is-carousel .tiles {
-        grid-auto-columns: calc((100% - 4 * var(--gap)) / 4.4);
+    .tile-row {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-auto-flow: row;
         margin: 0;
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* desktop carousel: all tiles in one row, moved by the arrow buttons */
+    .is-carousel .tiles {
+        grid-auto-flow: column;
+        grid-auto-columns: calc((100% - 4 * var(--gap)) / 4.4);
         padding: 4px 0 10px;
-        scroll-padding: 0;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .is-carousel .tile-row {
+        display: contents;
     }
 
     .carousel-nav {

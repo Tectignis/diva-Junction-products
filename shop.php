@@ -68,7 +68,9 @@ require __DIR__ . '/inc/head.php';
                 <?php endif; ?>
             </div>
             <div class="tiles">
-                <?php foreach ($tiles as $t): $link = safe_link($t['link']); ?>
+                <?php foreach (array_chunk($tiles, 4) as $row): ?>
+                <div class="tile-row">
+                <?php foreach ($row as $t): $link = safe_link($t['link']); ?>
                 <a class="tile" href="<?= e($link) ?>"<?= link_attrs($link) ?>>
                     <span class="tile-photo">
                         <?php if ($t['image']): ?><img src="<?= e(asset($t['image'])) ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
@@ -81,6 +83,8 @@ require __DIR__ . '/inc/head.php';
                         <span class="tile-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></span>
                     </span>
                 </a>
+                <?php endforeach; ?>
+                </div>
                 <?php endforeach; ?>
             </div>
         </section>
